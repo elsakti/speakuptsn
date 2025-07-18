@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1098574382087",
+    "project_id": "speakuptsn-68a3c",
+    "storage_bucket": "speakuptsn-68a3c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098574382087:android:e0fcd72f8b8735ceb296a2",
+        "android_client_info": {
+          "package_name": "com.example.speakup_tsn_mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyActFwjmi_-sFL-uVFEI5qATbKE5H9k39M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1098574382087:android:432e178d522ae2cdb296a2",
+        "android_client_info": {
+          "package_name": "speakup.tsn"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyActFwjmi_-sFL-uVFEI5qATbKE5H9k39M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
