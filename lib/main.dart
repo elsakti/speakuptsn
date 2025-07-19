@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'pages/landing_page.dart';
 import 'pages/login_page.dart';
 import 'firebase_options.dart';
+import 'pages/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Your App Name',
+      title: 'SpeakUp TSN',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.purple,
@@ -64,5 +65,6 @@ final GoRouter _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => const LandingPage()),
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(path: '/home', builder: (context, state) => const Home())
   ],
 );

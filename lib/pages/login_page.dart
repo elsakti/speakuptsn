@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/google_sign_in_button.dart';
@@ -200,20 +201,56 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 32),
 
                     // Sign In Button
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   height: 52,
+                    //   child: ElevatedButton(
+                    //     onPressed: _isFormValid && !_isLoading
+                    //         ? _signInWithEmail
+                    //         : null,
+                    //     style: ElevatedButton.styleFrom(
+                    //       backgroundColor: _isFormValid
+                    //           ? const Color(0xFF860092)
+                    //           : Colors.grey.shade300,
+                    //       foregroundColor: _isFormValid
+                    //           ? Colors.white
+                    //           : Colors.grey.shade600,
+                    //       elevation: 0,
+                    //       shape: RoundedRectangleBorder(
+                    //         borderRadius: BorderRadius.circular(26),
+                    //       ),
+                    //     ),
+                    //     child: _isLoading
+                    //         ? const SizedBox(
+                    //             height: 20,
+                    //             width: 20,
+                    //             child: CircularProgressIndicator(
+                    //               strokeWidth: 2,
+                    //               valueColor: AlwaysStoppedAnimation<Color>(
+                    //                 Colors.white,
+                    //               ),
+                    //             ),
+                    //           )
+                    //         : Text(
+                    //             'Sign In',
+                    //             style: GoogleFonts.inter(
+                    //               fontSize: 16,
+                    //               fontWeight: FontWeight.w600,
+                    //             ),
+                    //           ),
+                    //   ),
+                    // ),
                     SizedBox(
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
-                        onPressed: _isFormValid && !_isLoading
-                            ? _signInWithEmail
+                        // Always enabled for demo
+                        onPressed: !_isLoading
+                            ? () => context.go('/home')
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isFormValid
-                              ? const Color(0xFF860092)
-                              : Colors.grey.shade300,
-                          foregroundColor: _isFormValid
-                              ? Colors.white
-                              : Colors.grey.shade600,
+                          backgroundColor: const Color(0xFF860092),
+                          foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
