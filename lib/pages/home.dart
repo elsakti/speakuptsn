@@ -44,7 +44,7 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
-          'assets/images/tsn.jpg', // ganti dengan path gambar Anda
+          'assets/images/tsn.jpg', 
           height: 40,
         ),
         centerTitle: true,

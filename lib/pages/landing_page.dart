@@ -15,18 +15,11 @@ class LandingPage extends StatelessWidget {
             children: [
               // Logo at top center
               const SizedBox(height: 60),
-              Container(
+              Image.asset(
+                'assets/images/tsn.jpg',
                 width: 60,
-                height: 60,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF860092),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.flash_on,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                height: 37,
+                fit: BoxFit.cover,
               ),
 
               const Spacer(),

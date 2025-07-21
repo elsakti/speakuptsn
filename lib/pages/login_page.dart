@@ -162,18 +162,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 40),
 
               // Large Logo
-              Container(
+              Image.asset(
+                'assets/images/tsn.jpg',
                 width: 120,
-                height: 120,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF860092),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.flash_on,
-                  color: Colors.white,
-                  size: 64,
-                ),
+                height: 73,
+                fit: BoxFit.cover,
               ),
 
               const SizedBox(height: 60),
