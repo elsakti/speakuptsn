@@ -15,43 +15,23 @@ class _UploadReportPageState extends State<UploadReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: TextButton(
-          style: TextButton.styleFrom(
-            visualDensity: VisualDensity.compact,
-            padding: EdgeInsets.symmetric(horizontal: 2, vertical: 0),
-            alignment: Alignment.centerLeft,
-          ),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        leading: IconButton(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          icon: const Icon(Icons.close, color: Color.fromRGBO(134, 0, 146, 1)),
           onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Cancel',
-            style: TextStyle(
-              color: Color.fromRGBO(134, 0, 146, 1),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ),
         actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              visualDensity: VisualDensity.compact,
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-              alignment: Alignment.center,
-            ),
+          IconButton(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            icon: const Icon(Icons.send, color: Color.fromRGBO(134, 0, 146, 1)),
             onPressed: () {
               // Simpan data laporan
               Navigator.pop(context);
             },
-            child: const Text(
-              'Kirim',
-              style: TextStyle(
-                color: Color.fromRGBO(134, 0, 146, 1),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
           ),
         ],
-        backgroundColor: Colors.white,
-        elevation: 0.5,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,7 +46,7 @@ class _UploadReportPageState extends State<UploadReportPage> {
                   child: TextField(
                     controller: _textController,
                     decoration: const InputDecoration(
-                      hintText: "What's happening?",
+                      hintText: "What's happening?\nเกิดอะไรขึ้น?",
                       border: OutlineInputBorder(),
                     ),
                     maxLines: 6,
@@ -74,10 +54,13 @@ class _UploadReportPageState extends State<UploadReportPage> {
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.attach_file),
-              label: const Text('Upload File'),
+            IconButton(
+              icon: const Icon(
+                Icons.attach_file,
+                color: Color.fromRGBO(134, 0, 146, 1),
+              ),
               onPressed: () async {
                 setState(() {
                   _fileName = 'contoh_file.pdf';
