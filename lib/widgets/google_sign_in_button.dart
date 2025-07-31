@@ -49,7 +49,7 @@ class GoogleSignInButton extends StatelessWidget {
                     width: 20,
                     height: 20,
                     child: Image.asset(
-                      'assets/images/google_icon.png', // You'll need to add this asset
+                      'assets/images/google.png', // You'll need to add this asset
                       width: 20,
                       height: 20,
                     ),
