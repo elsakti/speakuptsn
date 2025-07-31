@@ -1,9 +1,48 @@
 import 'package:flutter/material.dart';
 import 'upload_report_page.dart';
 import 'search_page.dart';
+import '../widgets/logout_button.dart';
+import '../widgets/coin_display.dart';
+import '../services/coin_service.dart';
 
-class Home extends StatelessWidget {
+class Home extends StatefulWidget {
   const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  final CoinService _coinService = CoinService();
+  int _userCoins = 0; // Will be loaded from Firestore
+  bool _isLoadingCoins = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserCoins();
+  }
+
+  Future<void> _loadUserCoins() async {
+    try {
+      final coins = await _coinService.getCurrentUserCoins();
+      print('Loaded coins: $coins'); // Debug log
+      if (mounted) {
+        setState(() {
+          _userCoins = coins > 0 ? coins : 200; // Fallback untuk testing
+          _isLoadingCoins = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading coins: $e');
+      if (mounted) {
+        setState(() {
+          _userCoins = 200; // Fallback jika error
+          _isLoadingCoins = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,18 +115,33 @@ class Home extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 40.0),
-          child: Image.asset(
-            'assets/images/tsn2.jpg',
-            height: 35,
-            fit: BoxFit.contain,
-          ),
+        title: Image.asset(
+          'assets/images/tsn2.jpg',
+          height: 35,
+          fit: BoxFit.contain,
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _isLoadingCoins 
+              ? const SizedBox(
+                  width: 50,
+                  height: 30,
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                )
+              : CoinDisplay(coins: _userCoins),
+        ),
+        actions: [LogoutButton(), const SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
           child: Container(

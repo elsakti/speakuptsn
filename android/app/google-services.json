@@ -12,7 +12,20 @@
           "package_name": "com.example.speakup_tsn_mobile"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1098574382087-0l9t2maqgduog407mdmq8vo4sh2p6p4j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.speakup_tsn_mobile",
+            "certificate_hash": "d6e0402d54c162c8c80e3f2612512f02933d1e44"
+          }
+        },
+        {
+          "client_id": "1098574382087-q06sgiv08vt2nf95esu2lrp73uc15p5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyActFwjmi_-sFL-uVFEI5qATbKE5H9k39M"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1098574382087-9vf3bod7dq7906m8c9if678bim6egcjo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1098574382087-jlb511sr48hadgph64m0eiqm849hpi2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.speakupTsnMobile"
+              }
+            }
+          ]
         }
       }
     },
@@ -31,7 +56,12 @@
           "package_name": "speakup.tsn"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1098574382087-q06sgiv08vt2nf95esu2lrp73uc15p5d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyActFwjmi_-sFL-uVFEI5qATbKE5H9k39M"
@@ -39,7 +69,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1098574382087-9vf3bod7dq7906m8c9if678bim6egcjo.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1098574382087-jlb511sr48hadgph64m0eiqm849hpi2h.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.speakupTsnMobile"
+              }
+            }
+          ]
         }
       }
     }

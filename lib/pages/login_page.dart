@@ -37,8 +37,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _validateEmail() {
-    final email = _emailController.text;
-    final isValid = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+    final realName = _emailController.text;
+    final isValid = realName.trim().isNotEmpty;
     if (_isEmailValid != isValid) {
       setState(() {
         _isEmailValid = isValid;
@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _validatePassword() {
     final password = _passwordController.text;
-    final isValid = password.length >= 6;
+    final isValid = password.isNotEmpty;
     if (_isPasswordValid != isValid) {
       setState(() {
         _isPasswordValid = isValid;
@@ -92,28 +92,47 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _isLoading = true);
 
-    // Simulasi loading untuk melihat tampilan
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Demo mode - Login disabled')),
+    try {
+      await _authService.signInWithRealNameAndPassword(
+        _emailController.text.trim(),
+        _passwordController.text,
       );
-      setState(() => _isLoading = false);
+      
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
 
-    // Simulasi loading untuk melihat tampilan
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Demo mode - Google login disabled')),
-      );
-      setState(() => _isLoading = false);
+    try {
+      await _authService.signInWithGoogle();
+      
+      if (mounted) {
+        context.go('/home');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Google login failed: ${e.toString()}')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -237,13 +256,16 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       height: 52,
                       child: ElevatedButton(
-                        // Always enabled for demo
-                        onPressed: !_isLoading
-                            ? () => context.go('/home')
+                        onPressed: _isFormValid && !_isLoading
+                            ? _signInWithEmail
                             : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF860092),
-                          foregroundColor: Colors.white,
+                          backgroundColor: _isFormValid
+                              ? const Color(0xFF860092)
+                              : Colors.grey.shade300,
+                          foregroundColor: _isFormValid
+                              ? Colors.white
+                              : Colors.grey.shade600,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(26),
