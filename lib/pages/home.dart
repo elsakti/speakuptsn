@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
-import 'upload_report_page.dart';
+import 'upload_report_basic.dart';
 import 'search_page.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/coin_display.dart';
 import '../services/coin_service.dart';
+import '../services/report_service.dart';
+import '../services/user_service.dart';
+import '../models/report.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,13 +17,18 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final CoinService _coinService = CoinService();
-  int _userCoins = 0; // Will be loaded from Firestore
+  final ReportService _reportService = ReportService();
+  final UserService _userService = UserService();
+  int _userCoins = 0;
   bool _isLoadingCoins = true;
+  List<Report> _reports = [];
+  bool _isLoadingReports = true;
 
   @override
   void initState() {
     super.initState();
     _loadUserCoins();
+    _loadUserAndReports();
   }
 
   Future<void> _loadUserCoins() async {
@@ -44,8 +52,258 @@ class _HomeState extends State<Home> {
     }
   }
 
+  Future<void> _loadUserAndReports() async {
+    try {
+      // Load user first
+      await _userService.loadCurrentUser();
+      
+      List<Report> reports;
+      if (_userService.isTeacher) {
+        // Teachers see all reports
+        reports = await _reportService.getAllReports();
+      } else {
+        // Students only see verified reports
+        reports = await _reportService.getVerifiedReports();
+      }
+      
+      print('Loaded ${reports.length} reports for ${_userService.isTeacher ? "teacher" : "student"}');
+      if (mounted) {
+        setState(() {
+          _reports = reports;
+          _isLoadingReports = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading reports: $e');
+      if (mounted) {
+        setState(() {
+          _reports = [];
+          _isLoadingReports = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildReportCard(Report report) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header with user info and status
+            Row(
+              children: [
+                const Icon(Icons.account_circle, size: 45, color: Colors.grey),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _userService.isStudent ? 'Anonymous Student' : 'Student Report',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                        ),
+                      ),
+                      Text(
+                        report.getTimeAgo(),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                _buildStatusBadge(report.status),
+              ],
+            ),
+            
+            const SizedBox(height: 12),
+            
+            // Title
+            Text(
+              report.title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                height: 1.3,
+              ),
+            ),
+            
+            const SizedBox(height: 8),
+            
+            // Description
+            Text(
+              report.description,
+              style: const TextStyle(
+                fontSize: 14,
+                height: 1.4,
+                color: Colors.black87,
+              ),
+            ),
+            
+            // Image if available
+            if (report.photoPath.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  report.photoPath,
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.broken_image,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    );
+                  },
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+            
+            const SizedBox(height: 12),
+            
+            // Footer with report ID
+            Row(
+              children: [
+                Icon(
+                  Icons.assignment,
+                  size: 16,
+                  color: Colors.grey.shade600,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  'Report #${report.reportId}',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+                const Spacer(),
+                if (_userService.isTeacher && report.verificationNotes.isNotEmpty) ...[
+                  Icon(
+                    Icons.note,
+                    size: 16,
+                    color: Colors.grey.shade600,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Has notes',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge(String status) {
+    Color badgeColor;
+    String displayText;
+    IconData icon;
+
+    switch (status.toLowerCase()) {
+      case 'verified':
+        badgeColor = Colors.green;
+        displayText = 'Verified';
+        icon = Icons.verified;
+        break;
+      case 'pending':
+        badgeColor = Colors.orange;
+        displayText = 'Under Review';
+        icon = Icons.pending;
+        break;
+      case 'rejected':
+        badgeColor = Colors.red;
+        displayText = 'Rejected';
+        icon = Icons.cancel;
+        break;
+      default:
+        badgeColor = Colors.grey;
+        displayText = status;
+        icon = Icons.help;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: badgeColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: badgeColor.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: badgeColor,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            displayText,
+            style: TextStyle(
+              color: badgeColor,
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    /* // Hardcoded data replaced with Firestore data
     final reports = [
       {
         "name": "Martha Craig",
@@ -111,7 +369,7 @@ class _HomeState extends State<Home> {
             "A safe school starts with you.\nReport smoking. Report bullying.\nBe the voice for change. 📣\nTogether, we create a better space.\n#ReportToProtect #StudentVoices",
         "comments": "1.9K",
       },
-    ];
+    ]; // This array is no longer used - using _reports from Firestore instead*/
 
     return Scaffold(
       appBar: AppBar(
@@ -127,19 +385,42 @@ class _HomeState extends State<Home> {
         automaticallyImplyLeading: false,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: _isLoadingCoins 
-              ? const SizedBox(
-                  width: 50,
-                  height: 30,
-                  child: Center(
-                    child: SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
+          child: _userService.isStudent
+              ? (_isLoadingCoins 
+                  ? const SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                    )
+                  : CoinDisplay(coins: _userCoins))
+              : Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                )
-              : CoinDisplay(coins: _userCoins),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.school, size: 16, color: Colors.blue.shade700),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Teacher',
+                        style: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
         ),
         actions: [LogoutButton(), const SizedBox(width: 8)],
         bottom: PreferredSize(
@@ -151,91 +432,66 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: ListView.builder(
-        itemCount: reports.length,
-        itemBuilder: (context, index) {
-          final report = reports[index];
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 10,
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.account_circle, size: 55),
-                    const SizedBox(width: 20),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                report['name'] ?? '',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                "${report['handle']} · ${report['time']}",
-                                style: const TextStyle(
-                                  color: Color.fromRGBO(134, 0, 146, 1),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            report['content'] ?? '',
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.chat_bubble_outline,
-                                size: 16,
-                                color: Color.fromRGBO(134, 0, 146, 1),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                report['comments'].toString(),
-                                style: const TextStyle(
-                                  color: Color.fromRGBO(134, 0, 146, 1),
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+      body: _isLoadingReports 
+          ? const Center(child: CircularProgressIndicator())
+          : _reports.isEmpty
+              ? RefreshIndicator(
+                  onRefresh: _loadUserAndReports,
+                  child: ListView(
+                    children: const [
+                      SizedBox(height: 200),
+                      Center(
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.assignment,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            SizedBox(height: 16),
+                            Text(
+                              'No reports available',
+                              style: TextStyle(fontSize: 16, color: Colors.grey),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'Pull down to refresh',
+                              style: TextStyle(fontSize: 14, color: Colors.grey),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadUserAndReports,
+                  child: ListView.builder(
+                    itemCount: _reports.length,
+                    itemBuilder: (context, index) {
+                      final report = _reports[index];
+                      return _buildReportCard(report);
+                    },
+                  ),
                 ),
-              ),
-              const Divider(height: 1, thickness: 0.5),
-            ],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UploadReportPage()),
-          );
-        },
-        shape: const CircleBorder(),
-        backgroundColor: const Color.fromRGBO(134, 0, 146, 1),
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.edit),
-      ),
+      floatingActionButton: _userService.isStudent 
+          ? FloatingActionButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const UploadReportBasic()),
+                );
+                // Refresh reports after creating a new one
+                if (result == true) {
+                  _loadUserAndReports();
+                }
+              },
+              shape: const CircleBorder(),
+              backgroundColor: const Color.fromRGBO(134, 0, 146, 1),
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.edit),
+            )
+          : null,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0, // index untuk Home
         onTap: (index) {

@@ -1,122 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
 import '../models/report.dart';
 import '../services/report_service.dart';
 import '../services/user_service.dart';
 
-class UploadReportPage extends StatefulWidget {
-  const UploadReportPage({super.key});
+class UploadReportPageSimple extends StatefulWidget {
+  const UploadReportPageSimple({super.key});
 
   @override
-  State<UploadReportPage> createState() => _UploadReportPageState();
+  State<UploadReportPageSimple> createState() => _UploadReportPageSimpleState();
 }
 
-class _UploadReportPageState extends State<UploadReportPage> {
+class _UploadReportPageSimpleState extends State<UploadReportPageSimple> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final ReportService _reportService = ReportService();
   final UserService _userService = UserService();
-  final ImagePicker _picker = ImagePicker();
   
-  XFile? _selectedImage;
   bool _isSubmitting = false;
-  String? _uploadedImageUrl;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1080,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-        });
-      }
-    } catch (e) {
-      _showErrorSnackBar('Error picking image: $e');
-    }
-  }
-
-  Future<void> _takePhoto() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1080,
-        maxHeight: 1080,
-        imageQuality: 85,
-      );
-      
-      if (image != null) {
-        setState(() {
-          _selectedImage = image;
-        });
-      }
-    } catch (e) {
-      _showErrorSnackBar('Error taking photo: $e');
-    }
-  }
-
-  void _showImageSourceDialog() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: [
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Gallery'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickImage();
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Camera'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _takePhoto();
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<String?> _uploadImage() async {
-    if (_selectedImage == null) return null;
-
-    try {
-      final file = File(_selectedImage!.path);
-      final fileName = 'reports/${DateTime.now().millisecondsSinceEpoch}_${_selectedImage!.name}';
-      
-      final ref = FirebaseStorage.instance.ref().child(fileName);
-      final uploadTask = ref.putFile(file);
-      
-      final snapshot = await uploadTask;
-      final downloadUrl = await snapshot.ref.getDownloadURL();
-      
-      return downloadUrl;
-    } catch (e) {
-      print('Error uploading image: $e');
-      return null;
-    }
   }
 
   Future<void> _submitReport() async {
@@ -136,17 +42,12 @@ class _UploadReportPageState extends State<UploadReportPage> {
     });
 
     try {
-      // Upload image if selected
-      if (_selectedImage != null) {
-        _uploadedImageUrl = await _uploadImage();
-      }
-
       // Create report
       final report = Report.create(
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         reporterId: _userService.currentUser!.id,
-        photoPath: _uploadedImageUrl ?? '',
+        photoPath: '', // No image for now
       );
 
       await _reportService.createReport(report);
@@ -202,12 +103,6 @@ class _UploadReportPageState extends State<UploadReportPage> {
         backgroundColor: Colors.red,
       ),
     );
-  }
-
-  void _removeImage() {
-    setState(() {
-      _selectedImage = null;
-    });
   }
 
   @override
@@ -325,74 +220,6 @@ class _UploadReportPageState extends State<UploadReportPage> {
               maxLines: 6,
             ),
 
-            const SizedBox(height: 20),
-
-            // Image section
-            const Text(
-              'Photo Evidence (Optional)',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 8),
-            
-            if (_selectedImage != null) ...[
-              Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Stack(
-                    children: [
-                      Image.file(
-                        File(_selectedImage!.path),
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: GestureDetector(
-                          onTap: _removeImage,
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-            ],
-            
-            ElevatedButton.icon(
-              onPressed: _isSubmitting ? null : _showImageSourceDialog,
-              icon: const Icon(Icons.add_a_photo),
-              label: Text(_selectedImage == null ? 'Add Photo' : 'Change Photo'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey.shade100,
-                foregroundColor: const Color.fromRGBO(134, 0, 146, 1),
-                elevation: 0,
-                minimumSize: const Size(double.infinity, 48),
-              ),
-            ),
-
             const SizedBox(height: 32),
 
             // Guidelines
@@ -427,6 +254,33 @@ class _UploadReportPageState extends State<UploadReportPage> {
                     '• False reports may result in consequences\n'
                     '• All reports are treated confidentially',
                     style: TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Note about image upload
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.orange.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.photo_camera, color: Colors.orange.shade700, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Photo upload feature coming soon',
+                      style: TextStyle(
+                        color: Colors.orange.shade700,
+                        fontSize: 12,
+                      ),
+                    ),
                   ),
                 ],
               ),
