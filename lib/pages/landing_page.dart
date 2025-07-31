@@ -13,14 +13,19 @@ class LandingPage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 32.0),
           child: Column(
             children: [
-              // Logo at top center
               const SizedBox(height: 60),
-              Image.asset(
-                'assets/images/tsn.jpg',
-                width: 60,
-                height: 37,
-                fit: BoxFit.cover,
+
+              // Gambar logo center dan ukuran sedang, proporsional
+              Center(
+                child: Image.asset(
+                  'assets/images/tsn.jpg',
+                  width: 150, // Ukuran lebar gambar
+                  height: 150 * (530 / 868), // Tinggi proporsional
+                  fit: BoxFit.contain,
+                ),
               ),
+
+              const SizedBox(height: 30),
 
               const Spacer(),
 

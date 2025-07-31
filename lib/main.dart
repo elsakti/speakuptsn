@@ -3,16 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'firebase_options.dart';
 import 'pages/landing_page.dart';
 import 'pages/login_page.dart';
-import 'firebase_options.dart';
 import 'pages/home.dart';
+import 'pages/search_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -34,7 +34,6 @@ class MyApp extends StatelessWidget {
       title: 'SpeakUp TSN',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.purple,
         primaryColor: const Color(0xFF860092),
         scaffoldBackgroundColor: Colors.white,
         textTheme: GoogleFonts.interTextTheme(),
@@ -42,17 +41,6 @@ class MyApp extends StatelessWidget {
           backgroundColor: Colors.white,
           elevation: 0,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF860092),
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
         ),
       ),
       routerConfig: _router,
@@ -65,6 +53,7 @@ final GoRouter _router = GoRouter(
   routes: [
     GoRoute(path: '/', builder: (context, state) => const LandingPage()),
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
-    GoRoute(path: '/home', builder: (context, state) => const Home())
+    GoRoute(path: '/home', builder: (context, state) => const Home()),
+    GoRoute(path: '/search', builder: (context, state) => const SearchPage()),
   ],
 );
