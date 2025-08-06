@@ -303,74 +303,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    /* // Hardcoded data replaced with Firestore data
-    final reports = [
-      {
-        "name": "Martha Craig",
-        "handle": "",
-        "time": "12h",
-        "content":
-            "Smoking on school grounds harms others and breaks the rules. Let’s remind each other and keep our school safe. 🙏\n#SmokeFreeSchool #StayHealthy",
-        "comments": "28",
-      },
-      {
-        "name": "Maximilian",
-        "handle": "",
-        "time": "3h",
-        "content":
-            "Whether it's physical, verbal, or online bullying is violence. Silence only helps the bully.",
-        "comments": "46",
-      },
-      {
-        "name": "Tabitha Potter",
-        "handle": "",
-        "time": "14h",
-        "content":
-            "Secondhand smoke can severely impact students' developing lungs. Don’t ignore it—speak up and report it.\n#CleanEnvironment #StudentSafety",
-        "comments": "7",
-      },
-      {
-        "name": "karenne",
-        "handle": "",
-        "time": "10h",
-        "content":
-            "A safe school starts with you.\nReport smoking. Report bullying.\nBe the voice for change. 📣\nTogether, we create a better space.\n#ReportToProtect #StudentVoices",
-        "comments": "1.9K",
-      },
-      {
-        "name": "Martha Craig",
-        "handle": "",
-        "time": "12h",
-        "content":
-            "Smoking on school grounds harms others and breaks the rules. Let’s remind each other and keep our school safe. 🙏\n#SmokeFreeSchool #StayHealthy",
-        "comments": "28",
-      },
-      {
-        "name": "Maximilian",
-        "handle": "",
-        "time": "3h",
-        "content":
-            "Whether it's physical, verbal, or online bullying is violence. Silence only helps the bully.",
-        "comments": "46",
-      },
-      {
-        "name": "Tabitha Potter",
-        "handle": "",
-        "time": "14h",
-        "content":
-            "Secondhand smoke can severely impact students' developing lungs. Don’t ignore it—speak up and report it.\n#CleanEnvironment #StudentSafety",
-        "comments": "7",
-      },
-      {
-        "name": "karenne",
-        "handle": "",
-        "time": "10h",
-        "content":
-            "A safe school starts with you.\nReport smoking. Report bullying.\nBe the voice for change. 📣\nTogether, we create a better space.\n#ReportToProtect #StudentVoices",
-        "comments": "1.9K",
-      },
-    ]; // This array is no longer used - using _reports from Firestore instead*/
-
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
@@ -383,45 +315,6 @@ class _HomeState extends State<Home> {
         foregroundColor: Colors.black,
         elevation: 0,
         automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: _userService.isStudent
-              ? (_isLoadingCoins 
-                  ? const SizedBox(
-                      width: 50,
-                      height: 30,
-                      child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                    )
-                  : CoinDisplay(coins: _userCoins))
-              : Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.school, size: 16, color: Colors.blue.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Teacher',
-                        style: TextStyle(
-                          color: Colors.blue.shade700,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-        ),
         actions: [LogoutButton(), const SizedBox(width: 8)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
@@ -432,7 +325,7 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: _isLoadingReports 
+      body: _isLoadingReports
           ? const Center(child: CircularProgressIndicator())
           : _reports.isEmpty
               ? RefreshIndicator(
