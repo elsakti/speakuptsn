@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'upload_report_basic.dart';
 import 'search_page.dart';
+import 'comment.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/coin_display.dart';
 import '../services/coin_service.dart';
@@ -25,6 +26,9 @@ class _HomeState extends State<Home> {
   bool _isLoadingReports = true;
 
   @override
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /// Initializes state by loading user coins and user data with reports.
+  /*******  85dff1d2-baa9-4ee7-9c88-0d6b216e5f85  *******/
   void initState() {
     super.initState();
     _loadUserCoins();
@@ -56,7 +60,7 @@ class _HomeState extends State<Home> {
     try {
       // Load user first
       await _userService.loadCurrentUser();
-      
+
       List<Report> reports;
       if (_userService.isTeacher) {
         // Teachers see all reports
@@ -65,8 +69,10 @@ class _HomeState extends State<Home> {
         // Students only see verified reports
         reports = await _reportService.getVerifiedReports();
       }
-      
-      print('Loaded ${reports.length} reports for ${_userService.isTeacher ? "teacher" : "student"}');
+
+      print(
+        'Loaded ${reports.length} reports for ${_userService.isTeacher ? "teacher" : "student"}',
+      );
       if (mounted) {
         setState(() {
           _reports = reports;
@@ -114,7 +120,9 @@ class _HomeState extends State<Home> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _userService.isStudent ? 'Anonymous Student' : 'Student Report',
+                        _userService.isStudent
+                            ? 'Anonymous Student'
+                            : 'Student Report',
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
@@ -133,9 +141,9 @@ class _HomeState extends State<Home> {
                 _buildStatusBadge(report.status),
               ],
             ),
-            
+
             const SizedBox(height: 12),
-            
+
             // Title
             Text(
               report.title,
@@ -145,9 +153,9 @@ class _HomeState extends State<Home> {
                 height: 1.3,
               ),
             ),
-            
+
             const SizedBox(height: 8),
-            
+
             // Description
             Text(
               report.description,
@@ -157,7 +165,7 @@ class _HomeState extends State<Home> {
                 color: Colors.black87,
               ),
             ),
-            
+
             // Image if available
             if (report.photoPath.isNotEmpty) ...[
               const SizedBox(height: 12),
@@ -194,50 +202,44 @@ class _HomeState extends State<Home> {
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
+                      child: const Center(child: CircularProgressIndicator()),
                     );
                   },
                 ),
               ),
             ],
-            
+
             const SizedBox(height: 12),
-            
+
             // Footer with report ID
-            Row(
-              children: [
-                Icon(
-                  Icons.assignment,
-                  size: 16,
-                  color: Colors.grey.shade600,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Report #${report.reportId}',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 12,
+            InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CommentPage(report: report),
                   ),
-                ),
-                const Spacer(),
-                if (_userService.isTeacher && report.verificationNotes.isNotEmpty) ...[
+                );
+              },
+              child: Row(
+                children: const [
                   Icon(
-                    Icons.note,
+                    Icons.comment_rounded,
+                    color: Colors.deepPurple,
                     size: 16,
-                    color: Colors.grey.shade600,
                   ),
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4),
                   Text(
-                    'Has notes',
+                    '100',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: Colors.deepPurple,
                       fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ],
-              ],
+              ),
             ),
           ],
         ),
@@ -245,6 +247,24 @@ class _HomeState extends State<Home> {
     );
   }
 
+  /*************  ✨ Windsurf Command ⭐  *************/
+  /// Creates a small badge displaying the status of a report.
+  ///
+  /// The color of the badge and the icon are determined by the status.
+  /// The text is the status itself unless the status is "verified", "pending", or "rejected"
+  /// in which case a more descriptive text is used.
+  ///
+  /// The following table shows the mapping between status and badge properties:
+  ///
+  /// | Status | Badge Color | Icon | Text |
+  /// | --- | --- | --- | --- |
+  /// | Verified | Green | Icons.verified | Verified |
+  /// | Pending | Orange | Icons.pending | Under Review |
+  /// | Rejected | Red | Icons.cancel | Rejected |
+  /// | Other | Grey | Icons.help | Status text |
+  ///
+  /// The size of the badge can be controlled by the parent widget.
+  /*******  2014e281-bbbc-4c34-95b5-906033f559c3  *******/
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
     String displayText;
@@ -282,11 +302,7 @@ class _HomeState extends State<Home> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 12,
-            color: badgeColor,
-          ),
+          Icon(icon, size: 12, color: badgeColor),
           const SizedBox(width: 4),
           Text(
             displayText,
@@ -375,7 +391,7 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Image.asset(
           'assets/images/tsn2.jpg',
-          height: 35,
+          height: 25,
           fit: BoxFit.contain,
         ),
         centerTitle: true,
@@ -386,36 +402,39 @@ class _HomeState extends State<Home> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: _userService.isStudent
-              ? (_isLoadingCoins 
-                  ? const SizedBox(
-                      width: 50,
-                      height: 30,
-                      child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+              ? (_isLoadingCoins
+                    ? const SizedBox(
+                        width: 60,
+                        height: 40,
+                        child: Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 5),
+                          ),
                         ),
-                      ),
-                    )
-                  : CoinDisplay(coins: _userCoins))
+                      )
+                    : CoinDisplay(coins: _userCoins))
               : Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.school, size: 16, color: Colors.blue.shade700),
-                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.stars,
+                        size: 16,
+                        color: Colors.orange.shade700,
+                      ), // icon poin
+                      const SizedBox(width: 5),
                       Text(
-                        'Teacher',
+                        '120 pts', // nilai poin bisa diganti sesuai kebutuhan
                         style: TextStyle(
-                          color: Colors.blue.shade700,
+                          color: Colors.orange.shade700,
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.w900,
                         ),
                       ),
                     ],
@@ -432,54 +451,52 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: _isLoadingReports 
+      body: _isLoadingReports
           ? const Center(child: CircularProgressIndicator())
           : _reports.isEmpty
-              ? RefreshIndicator(
-                  onRefresh: _loadUserAndReports,
-                  child: ListView(
-                    children: const [
-                      SizedBox(height: 200),
-                      Center(
-                        child: Column(
-                          children: [
-                            Icon(
-                              Icons.assignment,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            SizedBox(height: 16),
-                            Text(
-                              'No reports available',
-                              style: TextStyle(fontSize: 16, color: Colors.grey),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              'Pull down to refresh',
-                              style: TextStyle(fontSize: 14, color: Colors.grey),
-                            ),
-                          ],
+          ? RefreshIndicator(
+              onRefresh: _loadUserAndReports,
+              child: ListView(
+                children: const [
+                  SizedBox(height: 200),
+                  Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.assignment, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'No reports available',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 8),
+                        Text(
+                          'Pull down to refresh',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
-                )
-              : RefreshIndicator(
-                  onRefresh: _loadUserAndReports,
-                  child: ListView.builder(
-                    itemCount: _reports.length,
-                    itemBuilder: (context, index) {
-                      final report = _reports[index];
-                      return _buildReportCard(report);
-                    },
-                  ),
-                ),
-      floatingActionButton: _userService.isStudent 
+                ],
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: _loadUserAndReports,
+              child: ListView.builder(
+                itemCount: _reports.length,
+                itemBuilder: (context, index) {
+                  final report = _reports[index];
+                  return _buildReportCard(report);
+                },
+              ),
+            ),
+      floatingActionButton: _userService.isStudent
           ? FloatingActionButton(
               onPressed: () async {
                 final result = await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const UploadReportBasic()),
+                  MaterialPageRoute(
+                    builder: (context) => const UploadReportBasic(),
+                  ),
                 );
                 // Refresh reports after creating a new one
                 if (result == true) {

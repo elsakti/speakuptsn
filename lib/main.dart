@@ -14,10 +14,11 @@ import 'services/route_guard.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Initialize Google Sign-In with serverClientId
   await GoogleSignIn.instance.initialize(
-    serverClientId: '1098574382087-q06sgiv08vt2nf95esu2lrp73uc15p5d.apps.googleusercontent.com',
+    serverClientId:
+        '1098574382087-q06sgiv08vt2nf95esu2lrp73uc15p5d.apps.googleusercontent.com',
   );
 
   SystemChrome.setSystemUIOverlayStyle(
