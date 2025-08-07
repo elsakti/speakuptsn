@@ -319,74 +319,6 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    /* // Hardcoded data replaced with Firestore data
-    final reports = [
-      {
-        "name": "Martha Craig",
-        "handle": "",
-        "time": "12h",
-        "content":
-            "Smoking on school grounds harms others and breaks the rules. Let’s remind each other and keep our school safe. 🙏\n#SmokeFreeSchool #StayHealthy",
-        "comments": "28",
-      },
-      {
-        "name": "Maximilian",
-        "handle": "",
-        "time": "3h",
-        "content":
-            "Whether it's physical, verbal, or online bullying is violence. Silence only helps the bully.",
-        "comments": "46",
-      },
-      {
-        "name": "Tabitha Potter",
-        "handle": "",
-        "time": "14h",
-        "content":
-            "Secondhand smoke can severely impact students' developing lungs. Don’t ignore it—speak up and report it.\n#CleanEnvironment #StudentSafety",
-        "comments": "7",
-      },
-      {
-        "name": "karenne",
-        "handle": "",
-        "time": "10h",
-        "content":
-            "A safe school starts with you.\nReport smoking. Report bullying.\nBe the voice for change. 📣\nTogether, we create a better space.\n#ReportToProtect #StudentVoices",
-        "comments": "1.9K",
-      },
-      {
-        "name": "Martha Craig",
-        "handle": "",
-        "time": "12h",
-        "content":
-            "Smoking on school grounds harms others and breaks the rules. Let’s remind each other and keep our school safe. 🙏\n#SmokeFreeSchool #StayHealthy",
-        "comments": "28",
-      },
-      {
-        "name": "Maximilian",
-        "handle": "",
-        "time": "3h",
-        "content":
-            "Whether it's physical, verbal, or online bullying is violence. Silence only helps the bully.",
-        "comments": "46",
-      },
-      {
-        "name": "Tabitha Potter",
-        "handle": "",
-        "time": "14h",
-        "content":
-            "Secondhand smoke can severely impact students' developing lungs. Don’t ignore it—speak up and report it.\n#CleanEnvironment #StudentSafety",
-        "comments": "7",
-      },
-      {
-        "name": "karenne",
-        "handle": "",
-        "time": "10h",
-        "content":
-            "A safe school starts with you.\nReport smoking. Report bullying.\nBe the voice for change. 📣\nTogether, we create a better space.\n#ReportToProtect #StudentVoices",
-        "comments": "1.9K",
-      },
-    ]; // This array is no longer used - using _reports from Firestore instead*/
-
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
@@ -451,6 +383,7 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
+      body: _isLoadingReports
       body: _isLoadingReports
           ? const Center(child: CircularProgressIndicator())
           : _reports.isEmpty
