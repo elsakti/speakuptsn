@@ -334,39 +334,36 @@ class _HomeState extends State<Home> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: _userService.isStudent
-              ? (_isLoadingCoins
-                    ? const SizedBox(
-                        width: 60,
-                        height: 40,
-                        child: Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 5),
-                          ),
+              ? (_isLoadingCoins 
+                  ? const SizedBox(
+                      width: 50,
+                      height: 30,
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         ),
-                      )
-                    : CoinDisplay(coins: _userCoins))
+                      ),
+                    )
+                  : CoinDisplay(coins: _userCoins))
               : Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade100,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.stars,
-                        size: 16,
-                        color: Colors.orange.shade700,
-                      ), // icon poin
-                      const SizedBox(width: 5),
+                      Icon(Icons.school, size: 16, color: Colors.blue.shade700),
+                      const SizedBox(width: 4),
                       Text(
-                        '120 pts', // nilai poin bisa diganti sesuai kebutuhan
+                        'Teacher',
                         style: TextStyle(
-                          color: Colors.orange.shade700,
+                          color: Colors.blue.shade700,
                           fontSize: 12,
-                          fontWeight: FontWeight.w900,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -383,7 +380,6 @@ class _HomeState extends State<Home> {
           ),
         ),
       ),
-      body: _isLoadingReports
       body: _isLoadingReports
           ? const Center(child: CircularProgressIndicator())
           : _reports.isEmpty
