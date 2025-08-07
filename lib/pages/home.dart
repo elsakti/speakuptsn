@@ -333,42 +333,28 @@ class _HomeState extends State<Home> {
         automaticallyImplyLeading: false,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: _userService.isStudent
-              ? (_isLoadingCoins 
-                  ? const SizedBox(
-                      width: 50,
-                      height: 30,
-                      child: Center(
-                        child: SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      ),
-                    )
-                  : CoinDisplay(coins: _userCoins))
-              : Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.school, size: 16, color: Colors.blue.shade700),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Teacher',
-                        style: TextStyle(
-                          color: Colors.blue.shade700,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.stars,
+                  size: 16,
+                  color: Colors.orange.shade700,
+                ), // icon poin
+                const SizedBox(width: 5),
+                Text(
+                  '120 pts', // nilai poin bisa diganti sesuai kebutuhan
+                  style: TextStyle(
+                    color: Colors.orange.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
+              ],
+            ),
+          ),
         ),
         actions: [LogoutButton(), const SizedBox(width: 8)],
         bottom: PreferredSize(
