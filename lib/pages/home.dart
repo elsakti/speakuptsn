@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'upload_report_basic.dart';
 import 'search_page.dart';
 import 'comment_page.dart';
-import '../widgets/logout_button.dart';
-import '../widgets/coin_display.dart';
 import '../services/coin_service.dart';
+import '../widgets/logout_button.dart';
 import '../services/report_service.dart';
 import '../services/user_service.dart';
 import '../models/report.dart';
@@ -26,9 +25,6 @@ class _HomeState extends State<Home> {
   bool _isLoadingReports = true;
 
   @override
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /// Initializes state by loading user coins and user data with reports.
-  /*******  85dff1d2-baa9-4ee7-9c88-0d6b216e5f85  *******/
   void initState() {
     super.initState();
     _loadUserCoins();
@@ -41,7 +37,7 @@ class _HomeState extends State<Home> {
       print('Loaded coins: $coins'); // Debug log
       if (mounted) {
         setState(() {
-          _userCoins = coins > 0 ? coins : 200; // Fallback untuk testing
+          _userCoins = coins;
           _isLoadingCoins = false;
         });
       }
@@ -49,7 +45,7 @@ class _HomeState extends State<Home> {
       print('Error loading coins: $e');
       if (mounted) {
         setState(() {
-          _userCoins = 200; // Fallback jika error
+          _userCoins = 0; // Show 0 if error loading
           _isLoadingCoins = false;
         });
       }
@@ -210,22 +206,15 @@ class _HomeState extends State<Home> {
             ],
 
             const SizedBox(height: 12),
-            
+
             // Footer with actions
             Row(
               children: [
-                Icon(
-                  Icons.assignment,
-                  size: 16,
-                  color: Colors.grey.shade600,
-                ),
+                Icon(Icons.assignment, size: 16, color: Colors.grey.shade600),
                 const SizedBox(width: 4),
                 Text(
                   'Report #${report.reportId}',
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
                 const Spacer(),
                 // Comment button
@@ -238,27 +227,22 @@ class _HomeState extends State<Home> {
                       ),
                     );
                   },
-                  icon: const Icon(
-                    Icons.chat_bubble_outline,
-                    size: 16,
-                  ),
-                  label: const Text(
-                    'Comments',
-                    style: TextStyle(fontSize: 12),
-                  ),
+                  icon: const Icon(Icons.chat_bubble_outline, size: 16),
+                  label: const Text('Comments', style: TextStyle(fontSize: 12)),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.grey.shade600,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
                 ),
-                if (_userService.isTeacher && report.verificationNotes.isNotEmpty) ...[
-                  Icon(
+                if (_userService.isTeacher &&
+                    report.verificationNotes.isNotEmpty) ...[
+                  const Icon(
                     Icons.comment_rounded,
                     color: Colors.deepPurple,
                     size: 16,
                   ),
-                  SizedBox(width: 4),
-                  Text(
+                  const SizedBox(width: 4),
+                  const Text(
                     '100',
                     style: TextStyle(
                       color: Colors.deepPurple,
@@ -268,7 +252,7 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
           ],
         ),
@@ -276,24 +260,6 @@ class _HomeState extends State<Home> {
     );
   }
 
-  /*************  ✨ Windsurf Command ⭐  *************/
-  /// Creates a small badge displaying the status of a report.
-  ///
-  /// The color of the badge and the icon are determined by the status.
-  /// The text is the status itself unless the status is "verified", "pending", or "rejected"
-  /// in which case a more descriptive text is used.
-  ///
-  /// The following table shows the mapping between status and badge properties:
-  ///
-  /// | Status | Badge Color | Icon | Text |
-  /// | --- | --- | --- | --- |
-  /// | Verified | Green | Icons.verified | Verified |
-  /// | Pending | Orange | Icons.pending | Under Review |
-  /// | Rejected | Red | Icons.cancel | Rejected |
-  /// | Other | Grey | Icons.help | Status text |
-  ///
-  /// The size of the badge can be controlled by the parent widget.
-  /*******  2014e281-bbbc-4c34-95b5-906033f559c3  *******/
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
     String displayText;
@@ -360,32 +326,36 @@ class _HomeState extends State<Home> {
         foregroundColor: Colors.black,
         elevation: 0,
         automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.stars,
-                  size: 16,
-                  color: Colors.orange.shade700,
-                ), // icon poin
-                const SizedBox(width: 5),
-                Text(
-                  '120 pts', // nilai poin bisa diganti sesuai kebutuhan
-                  style: TextStyle(
-                    color: Colors.orange.shade700,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w900,
-                  ),
+        leadingWidth: _userService.isTeacher ? 100 : null,
+        leading: _userService.isTeacher
+            ? Container(
+                margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 6,
                 ),
-              ],
-            ),
-          ),
-        ),
-        actions: [LogoutButton(), const SizedBox(width: 8)],
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.stars,
+                      size: 16,
+                      color: Colors.orange.shade700,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      _isLoadingCoins ? '...' : '$_userCoins',
+                      style: TextStyle(
+                        color: Colors.orange.shade700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : null,
+        actions: [LogoutButton(), const SizedBox(width: 4)],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(0.5),
           child: Container(

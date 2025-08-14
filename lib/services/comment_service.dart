@@ -10,10 +10,11 @@ class CommentService {
     return _firestore
         .collection('comments')
         .where('report_id', isEqualTo: reportId)
-        .orderBy('created_at', descending: false)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList();
+      var comments = snapshot.docs.map((doc) => Comment.fromFirestore(doc)).toList();
+      comments.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+      return comments;
     });
   }
 

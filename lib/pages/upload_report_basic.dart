@@ -25,6 +25,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
   bool _isSubmitting = false;
   XFile? _selectedImage;
   bool _isUploadingImage = false;
+  bool _enableImages = true; // Set to false to disable images
 
   @override
   void dispose() {
@@ -97,17 +98,24 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
       final bytes = await imageFile.readAsBytes();
       final compressedBytes = await _compressImage(bytes);
       
+      // Create a unique filename with timestamp
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+      
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('report_images')
-          .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
+          .child(fileName);
 
+      print('Uploading to path: report_images/$fileName');
+      
       final uploadTask = storageRef.putData(compressedBytes);
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
       
+      print('Upload successful: $downloadUrl');
       return downloadUrl;
     } catch (e) {
+      print('Upload error details: $e');
       _showMessage('Failed to upload image: $e', isError: true);
       return null;
     } finally {
@@ -174,9 +182,9 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
     });
 
     try {
-      // Upload image if selected
+      // Upload image if selected and images are enabled
       String photoPath = '';
-      if (_selectedImage != null) {
+      if (_enableImages && _selectedImage != null) {
         final uploadedImageUrl = await _uploadImage(_selectedImage!);
         if (uploadedImageUrl != null) {
           photoPath = uploadedImageUrl;
@@ -363,17 +371,19 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
 
             const SizedBox(height: 20),
 
-            // Image section
-            const Text(
-              'Add Photo (Optional)',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
+            // Image section - only show if images are enabled
+            if (_enableImages) ...[
+              const Text(
+                'Add Photo (Optional)',
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
+            ],
             
-            if (_selectedImage != null) ...[
+            if (_enableImages && _selectedImage != null) ...[
               Container(
                 width: double.infinity,
                 height: 200,
@@ -417,7 +427,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                   ),
                 ),
               ),
-            ] else ...[
+            ] else if (_enableImages) ...[
               GestureDetector(
                 onTap: _showImageOptions,
                 child: Container(

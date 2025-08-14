@@ -35,7 +35,7 @@ class _CommentPageState extends State<CommentPage> {
     try {
       final mentions = _commentService.extractMentions(_commentController.text);
       final comment = Comment.create(
-        reportId: widget.report.id,
+        reportId: widget.report.reportId.toString(),
         userId: _userService.currentUser!.id,
         content: _commentController.text.trim(),
         mentionedUsers: mentions,
@@ -242,7 +242,7 @@ class _CommentPageState extends State<CommentPage> {
           // Comments list
           Expanded(
             child: StreamBuilder<List<Comment>>(
-              stream: _commentService.getCommentsForReport(widget.report.id),
+              stream: _commentService.getCommentsForReport(widget.report.reportId.toString()),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return const Center(
