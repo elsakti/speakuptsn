@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'upload_report_basic.dart';
 import 'search_page.dart';
+import 'comment_page.dart';
 import '../widgets/logout_button.dart';
 import '../widgets/coin_display.dart';
 import '../services/coin_service.dart';
@@ -205,7 +206,7 @@ class _HomeState extends State<Home> {
             
             const SizedBox(height: 12),
             
-            // Footer with report ID
+            // Footer with actions
             Row(
               children: [
                 Icon(
@@ -222,6 +223,29 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 const Spacer(),
+                // Comment button
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CommentPage(report: report),
+                      ),
+                    );
+                  },
+                  icon: const Icon(
+                    Icons.chat_bubble_outline,
+                    size: 16,
+                  ),
+                  label: const Text(
+                    'Comments',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey.shade600,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                ),
                 if (_userService.isTeacher && report.verificationNotes.isNotEmpty) ...[
                   Icon(
                     Icons.note,
