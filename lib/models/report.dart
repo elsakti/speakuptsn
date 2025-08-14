@@ -56,7 +56,7 @@ class Report {
 
   factory Report.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    
+
     return Report(
       id: doc.id,
       createdAt: (data['created_at'] as Timestamp).toDate(),
@@ -68,8 +68,8 @@ class Report {
       title: data['title'] ?? '',
       updatedAt: (data['updated_at'] as Timestamp).toDate(),
       verificationNotes: data['verification_notes'] ?? '',
-      verifiedAt: data['verified_at'] != null 
-          ? (data['verified_at'] as Timestamp).toDate() 
+      verifiedAt: data['verified_at'] != null
+          ? (data['verified_at'] as Timestamp).toDate()
           : null,
       verifiedByTeacherId: data['verified_by_teacher_id'] ?? 0,
     );
@@ -86,7 +86,9 @@ class Report {
       'title': title,
       'updated_at': Timestamp.fromDate(updatedAt),
       'verification_notes': verificationNotes,
-      'verified_at': verifiedAt != null ? Timestamp.fromDate(verifiedAt!) : null,
+      'verified_at': verifiedAt != null
+          ? Timestamp.fromDate(verifiedAt!)
+          : null,
       'verified_by_teacher_id': verifiedByTeacherId,
     };
   }
