@@ -104,6 +104,21 @@ class ReportService {
     return getReportsByStatus('pending');
   }
 
+  Future<List<Report>> getActiveReports() async {
+    try {
+      final QuerySnapshot querySnapshot = await _firestore
+          .collection(_collection)
+          .where('status', whereIn: ['pending', 'verified'])
+          .orderBy('created_at', descending: true)
+          .get();
+
+      return querySnapshot.docs.map((doc) => Report.fromFirestore(doc)).toList();
+    } catch (e) {
+      print('Error fetching active reports: $e');
+      throw Exception('Failed to fetch active reports: $e');
+    }
+  }
+
   Future<void> updateReport(String reportId, Map<String, dynamic> updates) async {
     try {
       await _firestore.collection(_collection).doc(reportId).update(updates);
@@ -119,6 +134,32 @@ class ReportService {
     } catch (e) {
       print('Error deleting report: $e');
       throw Exception('Failed to delete report: $e');
+    }
+  }
+
+  Future<void> rejectReport(String docId) async {
+    try {
+      await updateReport(docId, {
+        'status': 'rejected',
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error rejecting report: $e');
+      throw Exception('Failed to reject report: $e');
+    }
+  }
+
+  Future<void> verifyReport(String docId, String teacherId) async {
+    try {
+      await updateReport(docId, {
+        'status': 'verified',
+        'verified_at': FieldValue.serverTimestamp(),
+        'verified_by_teacher_id': teacherId,
+        'updated_at': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      print('Error verifying report: $e');
+      throw Exception('Failed to verify report: $e');
     }
   }
 }

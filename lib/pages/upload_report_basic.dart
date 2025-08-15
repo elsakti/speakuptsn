@@ -25,7 +25,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
   bool _isSubmitting = false;
   XFile? _selectedImage;
   bool _isUploadingImage = false;
-  bool _enableImages = true; // Set to false to disable images
+  bool _enableImages = false; // Set to false to disable images
 
   @override
   void dispose() {

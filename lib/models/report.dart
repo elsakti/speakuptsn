@@ -62,8 +62,8 @@ class Report {
       createdAt: (data['created_at'] as Timestamp).toDate(),
       description: data['description'] ?? '',
       photoPath: data['photo_path'] ?? '',
-      reportId: data['report_id'] ?? 0,
-      reporterId: data['reporter_id'] ?? 0,
+      reportId: _parseInt(data['report_id']),
+      reporterId: _parseInt(data['reporter_id']),
       status: data['status'] ?? '',
       title: data['title'] ?? '',
       updatedAt: (data['updated_at'] as Timestamp).toDate(),
@@ -71,8 +71,15 @@ class Report {
       verifiedAt: data['verified_at'] != null
           ? (data['verified_at'] as Timestamp).toDate()
           : null,
-      verifiedByTeacherId: data['verified_by_teacher_id'] ?? 0,
+      verifiedByTeacherId: _parseInt(data['verified_by_teacher_id']),
     );
+  }
+
+  static int _parseInt(dynamic value) {
+    if (value == null) return 0;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value) ?? 0;
+    return 0;
   }
 
   Map<String, dynamic> toFirestore() {

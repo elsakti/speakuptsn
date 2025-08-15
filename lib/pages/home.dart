@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'upload_report_basic.dart';
 import 'search_page.dart';
 import 'comment_page.dart';
@@ -59,8 +60,8 @@ class _HomeState extends State<Home> {
 
       List<Report> reports;
       if (_userService.isTeacher) {
-        // Teachers see all reports
-        reports = await _reportService.getAllReports();
+        // Teachers see active reports (pending and verified, not rejected)
+        reports = await _reportService.getActiveReports();
       } else {
         // Students only see verified reports
         reports = await _reportService.getVerifiedReports();
@@ -217,6 +218,27 @@ class _HomeState extends State<Home> {
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
                 const Spacer(),
+                // Accept and Delete buttons for teachers on pending reports
+                if (_userService.isTeacher && report.status.toLowerCase() == 'pending') ...[
+                  IconButton(
+                    onPressed: () => _showAcceptConfirmationDialog(report),
+                    icon: const Icon(Icons.check_circle_outline, size: 20),
+                    style: IconButton.styleFrom(
+                      foregroundColor: Colors.green,
+                      padding: const EdgeInsets.all(8),
+                    ),
+                    tooltip: 'Accept Report',
+                  ),
+                  IconButton(
+                    onPressed: () => _showDeleteConfirmationDialog(report),
+                    icon: const Icon(Icons.delete_outline, size: 20),
+                    style: IconButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      padding: const EdgeInsets.all(8),
+                    ),
+                    tooltip: 'Reject Report',
+                  ),
+                ],
                 // Comment button
                 TextButton.icon(
                   onPressed: () {
@@ -310,6 +332,145 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  Future<void> _showDeleteConfirmationDialog(Report report) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Reject Report'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to reject Report #${report.reportId}?'),
+                const SizedBox(height: 8),
+                const Text(
+                  'This action will change the status to "Rejected" and remove it from the main feed.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('Reject'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _rejectReport(report);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _rejectReport(Report report) async {
+    try {
+      await _reportService.rejectReport(report.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Report rejected successfully'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+        // Refresh the reports list
+        _loadUserAndReports();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error rejecting report: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _showAcceptConfirmationDialog(Report report) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Accept Report'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to accept Report #${report.reportId}?'),
+                const SizedBox(height: 8),
+                const Text(
+                  'This action will verify the report and you will earn 10 coins.',
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(foregroundColor: Colors.green),
+              child: const Text('Accept'),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _acceptReport(report);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _acceptReport(Report report) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || user.email == null) return;
+      
+      // Verify the report
+      await _reportService.verifyReport(report.id, user.uid);
+      
+      // Add 10 coins to teacher using email
+      await _coinService.addCoins(user.email!, 10);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Report accepted successfully! You earned 10 coins.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Refresh the reports list and coins
+        _loadUserAndReports();
+        _loadUserCoins();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error accepting report: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
