@@ -257,13 +257,12 @@ class AuthService {
       }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-
+      
       if (googleAuth.idToken == null) {
         throw Exception('Failed to obtain Google authentication tokens');
       }
 
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
@@ -348,6 +347,4 @@ class AuthService {
   }
 }
 
-extension on GoogleSignInAuthentication {
-  get accessToken => null;
-}
+
