@@ -349,7 +349,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                   vertical: 12,
                 ),
               ),
-              maxLines: 1,
+              maxLines: 2,
             ),
 
             const SizedBox(height: 20),
