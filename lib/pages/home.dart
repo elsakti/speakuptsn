@@ -213,13 +213,31 @@ class _HomeState extends State<Home> {
               children: [
                 Icon(Icons.assignment, size: 16, color: Colors.grey.shade600),
                 const SizedBox(width: 4),
-                Text(
-                  'Report #${report.reportId}',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                Column(
+                  crossAxisAlignment:
+                      CrossAxisAlignment.start, // bisa diganti center
+                  children: [
+                    Text(
+                      'Report #${report.reportId}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                    Text(
+                      'หมายเลขรายงาน #${report.reportId}',
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
+
                 const Spacer(),
                 // Accept and Delete buttons for teachers on pending reports
-                if (_userService.isTeacher && report.status.toLowerCase() == 'pending') ...[
+                if (_userService.isTeacher &&
+                    report.status.toLowerCase() == 'pending') ...[
                   IconButton(
                     onPressed: () => _showAcceptConfirmationDialog(report),
                     icon: const Icon(Icons.check_circle_outline, size: 20),
@@ -250,7 +268,11 @@ class _HomeState extends State<Home> {
                     );
                   },
                   icon: const Icon(Icons.chat_bubble_outline, size: 16),
-                  label: const Text('Comments', style: TextStyle(fontSize: 12)),
+                  label: const Text(
+                    'Comments'
+                    '\nความคิดเห็น',
+                    style: TextStyle(fontSize: 12),
+                  ),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.grey.shade600,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -344,7 +366,9 @@ class _HomeState extends State<Home> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Are you sure you want to reject Report #${report.reportId}?'),
+                Text(
+                  'Are you sure you want to reject Report #${report.reportId}?',
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'This action will change the status to "Rejected" and remove it from the main feed.',
@@ -409,7 +433,9 @@ class _HomeState extends State<Home> {
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('Are you sure you want to accept Report #${report.reportId}?'),
+                Text(
+                  'Are you sure you want to accept Report #${report.reportId}?',
+                ),
                 const SizedBox(height: 8),
                 const Text(
                   'This action will verify the report and you will earn 10 coins.',
@@ -443,13 +469,13 @@ class _HomeState extends State<Home> {
     try {
       final user = FirebaseAuth.instance.currentUser;
       if (user == null || user.email == null) return;
-      
+
       // Verify the report
       await _reportService.verifyReport(report.id, user.uid);
-      
+
       // Add 10 coins to teacher using email
       await _coinService.addCoins(user.email!, 10);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -491,18 +517,11 @@ class _HomeState extends State<Home> {
         leading: _userService.isTeacher
             ? Container(
                 margin: const EdgeInsets.symmetric(horizontal: 8.0),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 6,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.stars,
-                      size: 16,
-                      color: Colors.orange.shade700,
-                    ),
+                    Icon(Icons.stars, size: 16, color: Colors.orange.shade700),
                     const SizedBox(width: 4),
                     Text(
                       _isLoadingCoins ? '...' : '$_userCoins',
@@ -540,13 +559,17 @@ class _HomeState extends State<Home> {
                         Icon(Icons.assignment, size: 64, color: Colors.grey),
                         SizedBox(height: 16),
                         Text(
-                          'No reports available',
+                          'No reports available'
+                          '\nไม่มีรายงาน',
                           style: TextStyle(fontSize: 16, color: Colors.grey),
+                          textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Pull down to refresh',
+                          'Pull down to refresh'
+                          '\nดึงลงเพื่อรีเฟรช',
                           style: TextStyle(fontSize: 14, color: Colors.grey),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -585,7 +608,8 @@ class _HomeState extends State<Home> {
             )
           : null,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // index untuk Home
+        type: BottomNavigationBarType.fixed,
+        currentIndex: 0,
         onTap: (index) {
           if (index == 1) {
             Navigator.push(
@@ -594,12 +618,49 @@ class _HomeState extends State<Home> {
             );
           }
         },
-
         selectedItemColor: const Color.fromRGBO(134, 0, 146, 1),
         unselectedItemColor: const Color.fromRGBO(134, 0, 146, 1),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        items: [
+          BottomNavigationBarItem(
+            icon: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.dashboard),
+                SizedBox(height: 2),
+                Text(
+                  "Home",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
+                ),
+                Text(
+                  "หน้าหลัก",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            label: '', // kosongkan biar tidak dobel
+          ),
+          BottomNavigationBarItem(
+            icon: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.search),
+                SizedBox(height: 2),
+                Text(
+                  "Search",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
+                ),
+                Text(
+                  "ค้นหา",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            label: '', // kosongkan juga
+          ),
         ],
       ),
     );

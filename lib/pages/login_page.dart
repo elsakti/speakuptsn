@@ -97,7 +97,7 @@ class _LoginPageState extends State<LoginPage> {
         _emailController.text.trim(),
         _passwordController.text,
       );
-      
+
       if (mounted) {
         context.go('/home');
       }
@@ -119,7 +119,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       await _authService.signInWithGoogle();
-      
+
       if (mounted) {
         context.go('/home');
       }
@@ -165,12 +165,14 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Sign In',
+          'Sign In\nเข้าสู่ระบบ',
+          textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             color: Colors.black,
             fontWeight: FontWeight.w600,
           ),
         ),
+
         centerTitle: true,
       ),
       body: SafeArea(
@@ -283,9 +285,12 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               )
                             : Text(
-                                'Sign In',
+                                'Sign In'
+                                '\nเข้าสู่ระบบ',
+                                textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
                                   fontSize: 16,
+
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),

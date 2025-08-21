@@ -67,58 +67,46 @@ class SearchPageState extends State<SearchPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          controller: _searchController,
-          focusNode: _focusNode,
-          onChanged: _onSearchChanged,
-          autofocus: true,
-          decoration: InputDecoration(
-            hintText: 'Search Twitter',
-            border: InputBorder.none,
-            hintStyle: TextStyle(color: Colors.grey[500]),
-          ),
-          style: GoogleFonts.inter(fontSize: 18),
-        ),
         backgroundColor: Colors.white,
         iconTheme: const IconThemeData(color: Color.fromRGBO(134, 0, 146, 1)),
+        title: Text(
+          "Search",
+          style: GoogleFonts.inter(
+            color: const Color.fromRGBO(134, 0, 146, 1),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      body: showResults
-          ? ListView.separated(
-              itemCount: _results.length,
-              separatorBuilder: (context, index) => const Divider(),
-              itemBuilder: (context, index) {
-                final user = _results[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage(user['avatar']!),
-                  ),
-                  title: Text(
-                    user['name']!,
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user['username']!,
-                        style: TextStyle(
-                          color: const Color.fromRGBO(134, 0, 146, 1),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(user['tweet']!),
-                    ],
-                  ),
-                  isThreeLine: true,
-                );
-              },
-            )
-          : Center(
-              child: Text(
-                'Search for people or tweets',
-                style: GoogleFonts.inter(color: Colors.grey[600]),
-              ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.hourglass_empty,
+              size: 80,
+              color: Color.fromRGBO(134, 0, 146, 1),
             ),
+            const SizedBox(height: 20),
+            Text(
+              "Coming Soon!\nเร็วๆ นี้",
+              style: GoogleFonts.inter(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromRGBO(134, 0, 146, 1),
+              ),
+              textAlign: TextAlign.center,
+            ),
+
+            const SizedBox(height: 10),
+            Text(
+              "The search feature is still under development"
+              "\nฟีเจอร์การค้นหายังอยู่ระหว่างการพัฒนา",
+              style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 1, // index untuk Search
         onTap: (index) {
@@ -128,9 +116,47 @@ class SearchPageState extends State<SearchPage> {
         },
         selectedItemColor: const Color.fromRGBO(134, 0, 146, 1),
         unselectedItemColor: const Color.fromRGBO(134, 0, 146, 1),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+        items: [
+          BottomNavigationBarItem(
+            icon: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.dashboard),
+                SizedBox(height: 2),
+                Text(
+                  "Home",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
+                ),
+                Text(
+                  "หน้าหลัก",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            label: '', // kosongkan biar tidak dobel
+          ),
+          BottomNavigationBarItem(
+            icon: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(Icons.search),
+                SizedBox(height: 2),
+                Text(
+                  "Search",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12),
+                ),
+                Text(
+                  "ค้นหา",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 11),
+                ),
+              ],
+            ),
+            label: '', // kosongkan juga
+          ),
         ],
       ),
     );

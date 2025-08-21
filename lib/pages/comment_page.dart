@@ -64,8 +64,8 @@ class _CommentPageState extends State<CommentPage> {
       decoration: BoxDecoration(
         color: comment.isDeleted ? Colors.red.shade50 : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(8),
-        border: comment.isDeleted 
-            ? Border.all(color: Colors.red.shade200) 
+        border: comment.isDeleted
+            ? Border.all(color: Colors.red.shade200)
             : null,
       ),
       child: Column(
@@ -89,10 +89,7 @@ class _CommentPageState extends State<CommentPage> {
                     ),
                     Text(
                       comment.getTimeAgo(),
-                      style: const TextStyle(
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
+                      style: const TextStyle(color: Colors.grey, fontSize: 12),
                     ),
                   ],
                 ),
@@ -139,12 +136,21 @@ class _CommentPageState extends State<CommentPage> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Comment'),
-        content: const Text('Are you sure you want to delete this comment? This action cannot be undone.'),
+        title: const Text(
+          'Delete Comment'
+          '\nลบความคิดเห็น',
+        ),
+        content: const Text(
+          'Are you sure you want to delete this comment? This action cannot be undone.'
+          '\nคุณแน่ใจหรือไม่ว่าต้องการลบความคิดเห็นนี้? การกระทำนี้ไม่สามารถย้อนกลับได้',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: const Text(
+              'Cancel'
+              '\nยกเลิก',
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -153,21 +159,30 @@ class _CommentPageState extends State<CommentPage> {
                 await _commentService.deleteComment(comment.id);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Comment deleted'),
+                    content: Text(
+                      'Comment deleted'
+                      '\nความคิดเห็นถูกลบแล้ว',
+                    ),
                     backgroundColor: Colors.green,
                   ),
                 );
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Failed to delete comment: $e'),
+                    content: Text(
+                      'Failed to delete comment: $e'
+                      '\nไม่สามารถลบความคิดเห็นได้: $e',
+                    ),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: const Text(
+              'Delete'
+              '\nลบ',
+            ),
           ),
         ],
       ),
@@ -238,22 +253,20 @@ class _CommentPageState extends State<CommentPage> {
               ],
             ),
           ),
-          
+
           // Comments list
           Expanded(
             child: StreamBuilder<List<Comment>>(
-              stream: _commentService.getCommentsForReport(widget.report.reportId.toString()),
+              stream: _commentService.getCommentsForReport(
+                widget.report.reportId.toString(),
+              ),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('Error loading comments'),
-                  );
+                  return const Center(child: Text('Error loading comments'));
                 }
 
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
+                  return const Center(child: CircularProgressIndicator());
                 }
 
                 final comments = snapshot.data ?? [];
@@ -263,16 +276,25 @@ class _CommentPageState extends State<CommentPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
+                        Icon(
+                          Icons.chat_bubble_outline,
+                          size: 64,
+                          color: Colors.grey,
+                        ),
                         SizedBox(height: 16),
                         Text(
-                          'No comments yet',
+                          'No comments yet'
+                          '\nยังไม่มีความคิดเห็น',
+
                           style: TextStyle(fontSize: 16, color: Colors.grey),
+                          textAlign: TextAlign.center,
                         ),
                         SizedBox(height: 8),
                         Text(
-                          'Be the first to start the discussion',
+                          'Be the first to start the discussion'
+                          '\nเริ่มการสนทนาเป็นคนแรก',
                           style: TextStyle(fontSize: 14, color: Colors.grey),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
@@ -289,7 +311,7 @@ class _CommentPageState extends State<CommentPage> {
               },
             ),
           ),
-          
+
           // Comment input
           Container(
             padding: const EdgeInsets.all(16),
@@ -303,9 +325,12 @@ class _CommentPageState extends State<CommentPage> {
                   child: TextField(
                     controller: _commentController,
                     decoration: const InputDecoration(
-                      hintText: 'Write a comment... (use @ to mention)',
+                      hintText: 'Write a comment... (use @ to mention)' '\nเขียนความคิดเห็น... (ใช้ @ เพื่อแท็ก)',
                       border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                     maxLines: null,
                     minLines: 1,
