@@ -21,7 +21,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
   final ReportService _reportService = ReportService();
   final UserService _userService = UserService();
   final ImagePicker _picker = ImagePicker();
-  
+
   bool _isSubmitting = false;
   XFile? _selectedImage;
   bool _isUploadingImage = false;
@@ -42,7 +42,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
         maxHeight: 1920,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           _selectedImage = image;
@@ -61,7 +61,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
         maxHeight: 1920,
         imageQuality: 85,
       );
-      
+
       if (image != null) {
         setState(() {
           _selectedImage = image;
@@ -79,9 +79,11 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
     // Calculate compression quality to keep under 2MB
     int quality = 85;
     Uint8List compressedBytes;
-    
+
     do {
-      compressedBytes = Uint8List.fromList(img.encodeJpg(image, quality: quality));
+      compressedBytes = Uint8List.fromList(
+        img.encodeJpg(image, quality: quality),
+      );
       if (compressedBytes.length <= 2 * 1024 * 1024) break; // 2MB limit
       quality -= 10;
     } while (quality > 10);
@@ -97,21 +99,21 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
 
       final bytes = await imageFile.readAsBytes();
       final compressedBytes = await _compressImage(bytes);
-      
+
       // Create a unique filename with timestamp
       final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-      
+
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('report_images')
           .child(fileName);
 
       print('Uploading to path: report_images/$fileName');
-      
+
       final uploadTask = storageRef.putData(compressedBytes);
       final snapshot = await uploadTask;
       final downloadUrl = await snapshot.ref.getDownloadURL();
-      
+
       print('Upload successful: $downloadUrl');
       return downloadUrl;
     } catch (e) {
@@ -140,7 +142,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Take Photo'),
+              title: const Text('Take Photo\nถ่ายรูป'),
               onTap: () {
                 Navigator.pop(context);
                 _takePhoto();
@@ -148,7 +150,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Choose from Gallery'),
+              title: const Text('Choose from Gallery\nเลือกจากแกลเลอรี่'),
               onTap: () {
                 Navigator.pop(context);
                 _pickImage();
@@ -166,14 +168,17 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
   }
 
   Future<void> _submitReport() async {
-    if (_titleController.text.trim().isEmpty || 
+    if (_titleController.text.trim().isEmpty ||
         _descriptionController.text.trim().isEmpty) {
-      _showMessage('Please fill in all required fields', isError: true);
+      _showMessage(
+        'Please fill in all required fields\nกรุณากรอกข้อมูลที่จําเป็น',
+        isError: true,
+      );
       return;
     }
 
     if (_userService.currentUser == null) {
-      _showMessage('User not logged in', isError: true);
+      _showMessage('User not logged in\nไม่พบผู้ใช้', isError: true);
       return;
     }
 
@@ -222,14 +227,13 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          icon: const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 64,
+          icon: const Icon(Icons.check_circle, color: Colors.green, size: 64),
+          title: const Text(
+            'Report Submitted\nรายงานถูกส่งเรียบร้อยแล้ว',
+            textAlign: TextAlign.center,
           ),
-          title: const Text('Report Submitted'),
           content: const Text(
-            'Your report has been submitted successfully and is now under review. You will be notified once it has been verified by a teacher.',
+            'Your report has been submitted successfully and is now under review.\nรายงานของคุณถูกส่งเรียบร้อยแล้วและกำลังอยู่ระหว่างการตรวจสอบ คุณจะได้รับการแจ้งเตือนเมื่อครูได้ทำการยืนยันแล้ว',
             textAlign: TextAlign.center,
           ),
           actions: [
@@ -237,7 +241,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('OK'),
+              child: const Text('OK\nตกลง'),
             ),
           ],
         );
@@ -266,7 +270,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
-          'Create Report',
+          'Create Report\nสร้างรายงาน',
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,
@@ -275,7 +279,9 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
         ),
         actions: [
           TextButton(
-            onPressed: (_isSubmitting || _isUploadingImage) ? null : _submitReport,
+            onPressed: (_isSubmitting || _isUploadingImage)
+                ? null
+                : _submitReport,
             child: (_isSubmitting || _isUploadingImage)
                 ? const SizedBox(
                     width: 20,
@@ -283,7 +289,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Text(
-                    'Submit',
+                    'Submit\nส่งรายงาน',
                     style: TextStyle(
                       color: Color.fromRGBO(134, 0, 146, 1),
                       fontWeight: FontWeight.w600,
@@ -315,56 +321,55 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                         ),
                       ),
                       const Text(
-                        'Student Report',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 14,
-                        ),
+                        'Student Report\nรายงานนักเรียน',
+                        style: TextStyle(color: Colors.grey, fontSize: 14),
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Title field
             const Text(
-              'Report Title *',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
+              'Report Title *\nหัวข้อรายงาน *',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                hintText: 'Give your report a clear title...',
+                hintText:
+                    'Give your report a clear title...\nโปรดระบุหัวข้อรายงานให้ชัดเจน...',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
               maxLines: 1,
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Description field
             const Text(
-              'Description *',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 16,
-              ),
+              'Description *\nรายละเอียดเหตุการณ์ *',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: _descriptionController,
               decoration: const InputDecoration(
-                hintText: 'Describe what happened in detail...\nโปรดอธิบายรายละเอียดเหตุการณ์...',
+                hintText:
+                    'Describe what happened in detail...\nโปรดอธิบายรายละเอียดเหตุการณ์...',
                 border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
               ),
               maxLines: 6,
             ),
@@ -374,15 +379,12 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
             // Image section - only show if images are enabled
             if (_enableImages) ...[
               const Text(
-                'Add Photo (Optional)',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                ),
+                'Add Photo (Optional)\nเพิ่มรูปภาพ (ไม่บังคับ)',
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
               ),
               const SizedBox(height: 8),
             ],
-            
+
             if (_enableImages && _selectedImage != null) ...[
               Container(
                 width: double.infinity,
@@ -420,7 +422,9 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                         Container(
                           color: Colors.black.withOpacity(0.5),
                           child: const Center(
-                            child: CircularProgressIndicator(color: Colors.white),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                     ],
@@ -434,17 +438,24 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                   width: double.infinity,
                   height: 120,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                    border: Border.all(
+                      color: Colors.grey.shade300,
+                      style: BorderStyle.solid,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                     color: Colors.grey.shade50,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.add_photo_alternate, size: 40, color: Colors.grey.shade600),
+                      Icon(
+                        Icons.add_photo_alternate,
+                        size: 40,
+                        color: Colors.grey.shade600,
+                      ),
                       const SizedBox(height: 8),
                       Text(
-                        'Tap to add photo',
+                        'Tap to add photo\nแตะเพื่อเพิ่มรูปภาพ',
                         style: TextStyle(color: Colors.grey.shade600),
                       ),
                     ],
@@ -471,7 +482,7 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                       Icon(Icons.info_outline, color: Colors.blue.shade700),
                       const SizedBox(width: 8),
                       Text(
-                        'Reporting Guidelines',
+                        'Reporting Guidelines\nแนวทางการรายงาน',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.blue.shade700,
@@ -482,10 +493,15 @@ class _UploadReportBasicState extends State<UploadReportBasic> {
                   const SizedBox(height: 8),
                   const Text(
                     '• Be specific and factual in your description\n'
+                    '  • โปรดระบุรายละเอียดและข้อเท็จจริงอย่างชัดเจนในคำอธิบายของคุณ\n\n'
                     '• Include relevant details like time and location\n'
+                    '  • ระบุรายละเอียดที่เกี่ยวข้อง เช่น เวลาและสถานที่\n\n'
                     '• Your report will be reviewed by teachers\n'
+                    '  • รายงานของคุณจะได้รับการตรวจสอบโดยครู\n\n'
                     '• False reports may result in consequences\n'
-                    '• All reports are treated confidentially',
+                    '  • การรายงานเท็จอาจส่งผลให้เกิดการลงโทษ\n\n'
+                    '• All reports are treated confidentially\n'
+                    '  • รายงานทั้งหมดจะถูกเก็บเป็นความลับ',
                     style: TextStyle(fontSize: 14),
                   ),
                 ],
