@@ -170,6 +170,8 @@ class _LoginPageState extends State<LoginPage> {
           style: GoogleFonts.inter(
             color: Colors.black,
             fontWeight: FontWeight.w600,
+            fontSize: 18, // smaller font size
+            height: 0.9, // line spacing height
           ),
         ),
 
@@ -289,8 +291,8 @@ class _LoginPageState extends State<LoginPage> {
                                 '\nเข้าสู่ระบบ',
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
-                                  fontSize: 16,
-
+                                  fontSize: 15,
+                                  height: 0.9, // line spacing height
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
